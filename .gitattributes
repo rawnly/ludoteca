@@ -1,0 +1,11 @@
+# Tutti i file di testo usano LF, sia nel repository sia nella cartella di lavoro,
+# indipendentemente da core.autocrlf. Visual Studio, Rider, VS Code, PowerShell,
+# Inno Setup e il compilatore XAML leggono LF senza problemi.
+* text=auto eol=lf
+
+# File binari: mai convertiti né confrontati come testo.
+*.ico binary
+*.png binary
+*.jpg binary
+*.exe binary
+*.dll binary
