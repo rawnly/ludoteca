@@ -105,6 +105,9 @@ public sealed class GameEntry : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Nome accessibile dei pulsanti (lettori di schermo, UI Automation).</summary>
+    public string UninstallLabel => $"Disinstalla {Name}";
+
     /// <summary>Motivo mostrato nella griglia "Da disinstallare".</summary>
     public string RecommendReason => Recommender.Reason(this);
     public string FreeableText => Recommender.Freeable(this);

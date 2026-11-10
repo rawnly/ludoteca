@@ -14,7 +14,8 @@
         <Grid.Resources>
             <CollectionViewSource x:Name="DriveGroups" IsSourceGrouped="True" />
 
-            <MenuFlyout x:Key="GameMenu">
+            <!-- Il gioco arriva dal Tag dell'elemento su cui si apre il menu (vedi GameMenu_Opening). -->
+            <MenuFlyout x:Key="GameMenu" Opening="GameMenu_Opening">
                 <MenuFlyoutItem Text="Apri cartella" Click="OpenFolder_Click">
                     <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE838;" /></MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
@@ -29,7 +30,7 @@
 
             <!-- Riga della lista: copertina piccola, nome, launcher/ultima partita/cartella, dimensione, azioni -->
             <DataTemplate x:Key="GameTemplate" x:DataType="local:GameEntry">
-                <Grid Padding="4,8" ColumnSpacing="14" ContextFlyout="{StaticResource GameMenu}">
+                <Grid Padding="4,8" ColumnSpacing="14" ContextFlyout="{StaticResource GameMenu}" Tag="{x:Bind}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
@@ -64,11 +65,13 @@
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
                     <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                        <Button Click="OpenFolder_Click" ToolTipService.ToolTip="Apri cartella"
+                        <Button Click="OpenFolder_Click" ToolTipService.ToolTip="Apri cartella" Tag="{x:Bind}"
+                                AutomationProperties.Name="Apri cartella"
                                 Background="Transparent" BorderThickness="0" Padding="8">
                             <FontIcon Glyph="&#xE838;" FontSize="16" />
                         </Button>
-                        <Button Click="Uninstall_Click" ToolTipService.ToolTip="Disinstalla" Padding="10,6">
+                        <Button Click="Uninstall_Click" ToolTipService.ToolTip="Disinstalla" Padding="10,6" Tag="{x:Bind}"
+                                AutomationProperties.Name="{x:Bind UninstallLabel}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE74D;" FontSize="14" />
                                 <TextBlock Text="Disinstalla" />
@@ -83,7 +86,7 @@
                 <Grid Padding="10" ColumnSpacing="12" CornerRadius="8" BorderThickness="1"
                       Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                       BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                      ContextFlyout="{StaticResource GameMenu}"
+                      ContextFlyout="{StaticResource GameMenu}" Tag="{x:Bind}"
                       ToolTipService.ToolTip="{x:Bind LastPlayedTooltip}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -120,7 +123,8 @@
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
                         </StackPanel>
-                        <Button Grid.Row="3" Click="Uninstall_Click" Padding="10,4">
+                        <Button Grid.Row="3" Click="Uninstall_Click" Padding="10,4" Tag="{x:Bind}"
+                                AutomationProperties.Name="{x:Bind UninstallLabel}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="&#xE74D;" FontSize="12" />
                                 <TextBlock Text="Disinstalla" Style="{StaticResource CaptionTextBlockStyle}" />

@@ -49,6 +49,7 @@ $packArgs = @(
     '--packVersion', $version,
     '--packDir', $publishDir,
     '--mainExe', 'Ludoteca.exe',
+    '--runtime', 'win-x64',
     '--packTitle', 'Ludoteca',
     '--packAuthors', 'Federico Vitale',
     '--icon', (Join-Path $root 'Assets\Ludoteca.ico'),

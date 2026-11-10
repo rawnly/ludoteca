@@ -359,7 +359,20 @@ public sealed partial class MainWindow : Window
 
     // ------------------------------------------------------------ azioni sul gioco
 
-    private static GameEntry? GameOf(object sender) => (sender as FrameworkElement)?.DataContext as GameEntry;
+    /// <summary>
+    /// Il gioco legato a un pulsante o a una voce di menu. Si usa il Tag (impostato con x:Bind nei template)
+    /// perché l'ItemsRepeater della griglia "Da disinstallare" non imposta il DataContext delle schede.
+    /// </summary>
+    private static GameEntry? GameOf(object sender) => sender is FrameworkElement element
+        ? element.Tag as GameEntry ?? element.DataContext as GameEntry
+        : null;
+
+    /// <summary>Il menu del clic destro è condiviso: prima di aprirlo gli si passa il gioco dell'elemento cliccato.</summary>
+    private void GameMenu_Opening(object? sender, object e)
+    {
+        if (sender is not MenuFlyout menu || GameOf(menu.Target) is not { } game) return;
+        foreach (var item in menu.Items) item.Tag = game;
+    }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
