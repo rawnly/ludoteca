@@ -188,7 +188,17 @@
                     </Button>
                 </Grid>
 
-                <InfoBar x:Name="Info" Grid.Row="1" IsOpen="False" IsClosable="True" />
+                <StackPanel Grid.Row="1" Spacing="8">
+                    <InfoBar x:Name="UpdateBar" IsOpen="False" IsClosable="True" Severity="Informational"
+                             Title="È disponibile una nuova versione">
+                        <InfoBar.ActionButton>
+                            <Button x:Name="UpdateButton" Content="Aggiorna e riavvia" Click="Update_Click"
+                                    Style="{StaticResource AccentButtonStyle}" />
+                        </InfoBar.ActionButton>
+                        <ProgressBar x:Name="UpdateProgress" Visibility="Collapsed" Maximum="100" Margin="0,0,0,12" />
+                    </InfoBar>
+                    <InfoBar x:Name="Info" IsOpen="False" IsClosable="True" />
+                </StackPanel>
 
                 <ListView x:Name="AllList" Grid.Row="2" SelectionMode="None"
                           ItemTemplate="{StaticResource GameTemplate}" Padding="0,0,0,24">
@@ -257,6 +267,15 @@
                             <Button Content="Svuota cache copertine" Click="ClearCovers_Click" />
                         </StackPanel>
                         <TextBlock x:Name="SettingsStatus" TextWrapping="Wrap" />
+
+                        <TextBlock Text="Aggiornamenti" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,0" />
+                        <TextBlock x:Name="VersionText" TextWrapping="Wrap"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button x:Name="CheckUpdatesButton" Content="Controlla aggiornamenti" Click="CheckUpdates_Click" />
+                            <HyperlinkButton Content="Note di rilascio" NavigateUri="https://github.com/rawnly/ludoteca/releases" />
+                        </StackPanel>
+                        <TextBlock x:Name="UpdateStatus" TextWrapping="Wrap" />
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

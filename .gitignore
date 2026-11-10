@@ -2,8 +2,9 @@
 bin/
 obj/
 
-# App pubblicata e installer generati da installer/build.ps1
+# App pubblicata e pacchetti generati da release.ps1
 publish/
+releases/
 dist/
 
 # IDE

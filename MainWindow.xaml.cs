@@ -16,6 +16,7 @@ public sealed partial class MainWindow : Window
     private int _recColumns = 3;
     private bool _sizesDone;
     private AppSettings _settings = AppSettings.Load();
+    private readonly Updates _updates = new();
 
     public MainWindow()
     {
@@ -27,6 +28,10 @@ public sealed partial class MainWindow : Window
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "Ludoteca.ico"));
 
         UpdateSecretPlaceholder();
+        VersionText.Text = _updates.IsInstalled
+            ? $"Versione installata: {_updates.CurrentVersion}. Ludoteca controlla gli aggiornamenti a ogni avvio."
+            : $"Versione {_updates.CurrentVersion} (sviluppo): gli aggiornamenti funzionano solo nella versione installata con il Setup.";
+        CheckUpdatesButton.IsEnabled = _updates.IsInstalled;
         Nav.SelectedItem = Nav.MenuItems[0];
         Nav.Loaded += (_, _) =>
         {
@@ -37,6 +42,61 @@ public sealed partial class MainWindow : Window
             }
         };
         _ = RefreshAsync();
+        _ = CheckUpdatesAsync(silent: true);
+    }
+
+    // ------------------------------------------------------------ aggiornamenti
+
+    private async Task CheckUpdatesAsync(bool silent)
+    {
+        if (!_updates.IsInstalled) return;
+        CheckUpdatesButton.IsEnabled = false;
+        UpdateStatus.Text = "Controllo…";
+        try
+        {
+            var version = await _updates.CheckAsync();
+            if (version is null)
+            {
+                UpdateStatus.Text = $"Hai già l'ultima versione ({_updates.CurrentVersion}).";
+                return;
+            }
+            UpdateStatus.Text = $"Disponibile la versione {version}.";
+            UpdateBar.Message = $"Ludoteca {version} è pronta da installare (hai la {_updates.CurrentVersion}). L'app si riavvierà da sola.";
+            UpdateBar.IsOpen = true;
+        }
+        catch (Exception ex)
+        {
+            // Senza rete non è un errore da mostrare all'avvio: lo si vede solo se lo chiedi tu.
+            UpdateStatus.Text = $"Non riesco a controllare gli aggiornamenti: {ex.Message}";
+            if (!silent) ShowInfo("Controllo aggiornamenti non riuscito", ex.Message, InfoBarSeverity.Warning);
+        }
+        finally
+        {
+            CheckUpdatesButton.IsEnabled = true;
+        }
+    }
+
+    private async void CheckUpdates_Click(object sender, RoutedEventArgs e) => await CheckUpdatesAsync(silent: false);
+
+    private async void Update_Click(object sender, RoutedEventArgs e)
+    {
+        UpdateButton.IsEnabled = false;
+        UpdateBar.IsClosable = false;
+        UpdateProgress.Visibility = Visibility.Visible;
+        UpdateBar.Message = "Scarico l'aggiornamento…";
+        var ui = DispatcherQueue;
+        try
+        {
+            await _updates.DownloadAndRestartAsync(p => ui.TryEnqueue(() => UpdateProgress.Value = p));
+        }
+        catch (Exception ex)
+        {
+            UpdateBar.Severity = InfoBarSeverity.Error;
+            UpdateBar.Message = $"Aggiornamento non riuscito: {ex.Message}";
+            UpdateButton.IsEnabled = true;
+            UpdateBar.IsClosable = true;
+            UpdateProgress.Visibility = Visibility.Collapsed;
+        }
     }
 
     // ------------------------------------------------------------ scansione

@@ -21,11 +21,14 @@ Un'app per Windows 11 che trova tutti i giochi installati sul PC, li divide per 
 
 ## Installazione
 
-Scarica `Ludoteca-Setup-<versione>.exe` dall'ultima [release](https://github.com/rawnly/ludoteca/releases/latest) e avvialo.
+Scarica `Ludoteca-win-Setup.exe` dall'ultima [release](https://github.com/rawnly/ludoteca/releases/latest) e avvialo. In alternativa c'è `Ludoteca-win-Portable.zip`, che si usa senza installare.
 
 - Serve **Windows 10 (versione 2004 o successiva) o Windows 11, a 64 bit**. Non serve installare .NET: è già incluso.
 - Si installa solo per il tuo utente, senza permessi di amministratore, e si disinstalla da *Impostazioni → App installate*.
+- **Si aggiorna da sola**: a ogni avvio controlla se c'è una nuova versione e, quando c'è, basta premere *Aggiorna e riavvia*. Scarica solo le differenze.
 - L'installer non ha una firma digitale, quindi Windows SmartScreen mostra "Windows ha protetto il PC": premi **Ulteriori informazioni → Esegui comunque**.
+
+> Hai la 1.3.0? Era installata con un sistema diverso e non si aggiorna da sola: installa la nuova versione e poi disinstalla la vecchia da *App installate*. Impostazioni e copertine vengono mantenute.
 
 ## Come trova i giochi
 
@@ -57,10 +60,15 @@ Serve il [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0). Visual 
 dotnet run
 ```
 
-Per creare l'installer serve [Inno Setup 6](https://jrsoftware.org/isinfo.php) (`winget install JRSoftware.InnoSetup`):
+### Pubblicare una nuova versione
+
+Installer e aggiornamenti sono gestiti da [Velopack](https://velopack.io). Servono la sua CLI (`dotnet tool install -g vpk`) e [GitHub CLI](https://cli.github.com) autenticata.
+
+1. Alza `<Version>` in `Ludoteca.csproj` e fai commit e push.
+2. Prepara e pubblica:
 
 ```bash
-powershell -ExecutionPolicy Bypass -File installer\build.ps1
+.\release.ps1 -Publish
 ```
 
-L'installer viene creato in `dist\`.
+Lo script compila l'app, crea in `releases\` il Setup, lo zip portatile e i pacchetti di aggiornamento (anche quello che contiene solo le differenze rispetto alla versione precedente) e li carica in una GitHub Release con tag `v<versione>`. Senza `-Publish` prepara tutto senza pubblicare niente.
