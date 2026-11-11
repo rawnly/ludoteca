@@ -56,6 +56,18 @@ public static partial class PlayHistory
                 // un gioco senza dati non deve fermare gli altri
             }
         }
+
+        // Le partite avviate da Ludoteca sono esatte: vincono su stime e date più vecchie.
+        var ownPlays = PlayLog.Load();
+        foreach (var game in games)
+        {
+            if (ownPlays.TryGetValue(game.CoverKey, out var when) && when > (game.LastPlayed ?? DateTime.MinValue))
+            {
+                game.LastPlayed = when;
+                game.LastPlayedIsEstimate = false;
+                game.NeverPlayed = false;
+            }
+        }
     }
 
     private static void Estimate(GameEntry game, DateTime? when)

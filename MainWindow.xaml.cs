@@ -41,6 +41,7 @@ public sealed partial class MainWindow : Window
                 Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(settingsItem, "Impostazioni");
             }
         };
+        InitTv();
         _ = RefreshAsync();
         _ = CheckUpdatesAsync(silent: true);
     }
@@ -113,6 +114,7 @@ public sealed partial class MainWindow : Window
             _sizesDone = false;
             ApplyFilter();
             UpdateRecommendations();
+            ShowTvGames();
             _ = ComputeSizesAsync(_games);
             _ = LoadCoversAsync(_games);
 
@@ -374,6 +376,24 @@ public sealed partial class MainWindow : Window
         foreach (var item in menu.Items) item.Tag = game;
     }
 
+    private async void Play_Click(object sender, RoutedEventArgs e)
+    {
+        if (GameOf(sender) is { } game) await PlayAsync(game);
+    }
+
+    private async Task PlayAsync(GameEntry game)
+    {
+        try
+        {
+            await Launcher.PlayAsync(game);
+            ShowInfo($"Avvio di {game.Name}…", $"Il gioco parte tramite {game.Source}: potrebbe volerci qualche secondo.", InfoBarSeverity.Success);
+        }
+        catch (Exception ex)
+        {
+            ShowInfo($"Non riesco ad avviare {game.Name}", ex.Message, InfoBarSeverity.Error);
+        }
+    }
+
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
         if (GameOf(sender) is { } game) Uninstaller.OpenFolder(game);
@@ -389,8 +409,11 @@ public sealed partial class MainWindow : Window
 
     private async void Uninstall_Click(object sender, RoutedEventArgs e)
     {
-        if (GameOf(sender) is not { } game) return;
+        if (GameOf(sender) is { } game) await UninstallAsync(game);
+    }
 
+    private async Task UninstallAsync(GameEntry game)
+    {
         var dialog = new ContentDialog
         {
             XamlRoot = Content.XamlRoot,

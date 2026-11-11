@@ -226,7 +226,7 @@ public static class Covers
         ["unins", "crash", "setup", "install", "update", "redist", "vc_", "dxsetup", "helper", "report", "launcher", "bootstrap", "ux"];
 
     /// <summary>L'exe più grande nella cartella (fino a 2 livelli), escludendo installer e strumenti.</summary>
-    private static string? MainExecutable(string dir)
+    internal static string? MainExecutable(string dir)
     {
         try
         {
@@ -270,6 +270,26 @@ public static class Covers
             })
             .OrderByDescending(File.GetLastWriteTimeUtc)
             .FirstOrDefault();
+    }
+
+    /// <summary>Lo sfondo largo della pagina del gioco (library_hero), dalla cache del client Steam.</summary>
+    public static string? SteamHero(string appId)
+    {
+        try
+        {
+            var steamPath = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "SteamPath", null) as string;
+            if (string.IsNullOrEmpty(steamPath)) return null;
+            var dir = Path.Combine(Path.GetFullPath(steamPath), "appcache", "librarycache", appId);
+            if (!Directory.Exists(dir)) return null;
+            return Directory.EnumerateFiles(dir, "library_hero*.jpg", SearchOption.AllDirectories)
+                .Where(f => !Path.GetFileName(f).Contains("blur", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(File.GetLastWriteTimeUtc)
+                .FirstOrDefault();
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static async Task<string?> SteamCdnAsync(string appId, CancellationToken ct)

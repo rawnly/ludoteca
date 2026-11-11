@@ -1,12 +1,14 @@
 # Ludoteca
 
-Un'app per Windows 11 che trova tutti i giochi installati sul PC, li divide per disco e ti dice quali conviene disinstallare: quelli grandi a cui non giochi da più tempo.
+Un'app per Windows 11 che trova tutti i giochi installati sul PC, li avvia da un unico posto (anche dal divano, con il controller), li divide per disco e ti dice quali conviene disinstallare: quelli grandi a cui non giochi da più tempo.
 
 ![Ludoteca: la griglia "Da disinstallare" e l'elenco dei giochi](docs/screenshots/tutti-i-giochi.png)
 
 ## Cosa fa
 
 - **Trova i giochi di tutti i launcher**: Steam, Xbox / Game Pass, Epic, Ubisoft Connect, Battle.net, Riot, GOG ed EA, più i giochi installati senza launcher che compaiono in "App installate".
+- **Gioca da Ludoteca**: ogni gioco parte dal suo launcher (Steam, Xbox, Epic, Ubisoft, Riot, Battle.net), così login, overlay e aggiornamenti funzionano come sempre.
+- **Modalità TV**: schermo intero con le copertine e lo sfondo del gioco, da usare con il controller o con la tastiera.
 - **Ti consiglia cosa disinstallare**: in cima c'è una griglia con i giochi fermi da almeno un mese, ordinati per tempo dall'ultima partita e spazio occupato. È 3×3 se la finestra è larga e 2×2 se è stretta.
 - **Ultima partita** per ogni gioco: esatta per Steam (con le ore giocate) e Battle.net, stimata dai salvataggi o dai log per Xbox, Ubisoft e Riot.
 - **Vista per disco**, con lo spazio occupato dai giochi e quello libero su ogni disco.
@@ -18,6 +20,23 @@ Un'app per Windows 11 che trova tutti i giochi installati sul PC, li divide per 
 | ![La griglia diventa 2×2 quando la finestra è stretta](docs/screenshots/finestra-stretta.png) | ![I giochi divisi per disco, con lo spazio occupato e libero](docs/screenshots/per-disco.png) |
 
 ![Impostazioni: la chiave di SteamGridDB per le copertine](docs/screenshots/impostazioni.png)
+
+## Modalità TV
+
+![Modalità TV: lo sfondo del gioco selezionato e la fila di copertine](docs/screenshots/modalita-tv.jpg)
+
+Si apre con il pulsante **Modalità TV**, con **F11**, con **Start** sul controller oppure avviando `Ludoteca.exe --tv`. I giochi giocati più di recente vengono per primi.
+
+| Controller (Xbox o compatibile) | Tastiera | Azione |
+|---|---|---|
+| D-pad / stick sinistro | frecce | scorri i giochi, ↑ per i pulsanti |
+| **A** | Invio | gioca |
+| **Y** | tasto Menu | opzioni (gioca, disinstalla) |
+| **B** | Esc | indietro, chiude i menu |
+| **LB / RB** | | salta di 5 giochi |
+| **View** (⧉) | Esc / F11 | esci dalla modalità TV |
+
+Mentre giochi Ludoteca è in secondo piano e ignora il controller. Con uno Steam Controller, aggiungi Ludoteca a Steam come "gioco non Steam": così Steam Input lo presenta come un controller Xbox.
 
 ## Installazione
 

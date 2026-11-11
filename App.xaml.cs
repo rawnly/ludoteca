@@ -34,11 +34,11 @@ public partial class App : Application
         Parallel.ForEach(result.Games, new ParallelOptions { MaxDegreeOfParallelism = 4 },
             g => g.SizeBytes = Format.FolderSize(g.InstallPath));
 
-        var lines = new List<string> { "Nome;Fonte;Disco;Dimensione;Byte;Ultima partita;Data;Stima;Minuti giocati;Cartella;Disinstallazione" };
+        var lines = new List<string> { "Nome;Fonte;Disco;Dimensione;Byte;Ultima partita;Data;Stima;Minuti giocati;Cartella;Avvio;Disinstallazione" };
         lines.AddRange(result.Games.Select(g =>
             string.Join(";", Csv(g.Name), g.Source, g.Drive, Csv(g.SizeText), g.SizeBytes,
                 Csv(g.LastPlayedText), g.LastPlayed?.ToString("yyyy-MM-dd HH:mm"), g.LastPlayedIsEstimate ? "sì" : "",
-                g.PlaytimeMinutes, Csv(g.InstallPath), Csv($"{g.UninstallKind}: {g.UninstallTarget}"))));
+                g.PlaytimeMinutes, Csv(g.InstallPath), Csv(Launcher.Describe(g)), Csv($"{g.UninstallKind}: {g.UninstallTarget}"))));
         lines.AddRange(result.Warnings.Select(w => "# avviso: " + w));
         File.WriteAllLines(file, lines, new System.Text.UTF8Encoding(true));
     }

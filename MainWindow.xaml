@@ -16,6 +16,10 @@
 
             <!-- Il gioco arriva dal Tag dell'elemento su cui si apre il menu (vedi GameMenu_Opening). -->
             <MenuFlyout x:Key="GameMenu" Opening="GameMenu_Opening">
+                <MenuFlyoutItem Text="Gioca" Click="Play_Click">
+                    <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE768;" /></MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator />
                 <MenuFlyoutItem Text="Apri cartella" Click="OpenFolder_Click">
                     <MenuFlyoutItem.Icon><FontIcon Glyph="&#xE838;" /></MenuFlyoutItem.Icon>
                 </MenuFlyoutItem>
@@ -70,11 +74,17 @@
                                 Background="Transparent" BorderThickness="0" Padding="8">
                             <FontIcon Glyph="&#xE838;" FontSize="16" />
                         </Button>
-                        <Button Click="Uninstall_Click" ToolTipService.ToolTip="Disinstalla" Padding="10,6" Tag="{x:Bind}"
-                                AutomationProperties.Name="{x:Bind UninstallLabel}">
+                        <Button Click="Uninstall_Click" ToolTipService.ToolTip="Disinstalla" Tag="{x:Bind}"
+                                AutomationProperties.Name="{x:Bind UninstallLabel}"
+                                Background="Transparent" BorderThickness="0" Padding="8">
+                            <FontIcon Glyph="&#xE74D;" FontSize="16" />
+                        </Button>
+                        <Button Click="Play_Click" ToolTipService.ToolTip="Gioca" Padding="14,6" Tag="{x:Bind}"
+                                AutomationProperties.Name="{x:Bind PlayLabel}"
+                                Style="{StaticResource AccentButtonStyle}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE74D;" FontSize="14" />
-                                <TextBlock Text="Disinstalla" />
+                                <FontIcon Glyph="&#xE768;" FontSize="14" />
+                                <TextBlock Text="Gioca" />
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -133,7 +143,27 @@
                     </Grid>
                 </Grid>
             </DataTemplate>
+
+            <!-- Copertina della modalità TV -->
+            <DataTemplate x:Key="TvCoverTemplate" x:DataType="local:GameEntry">
+                <StackPanel Spacing="10" Width="200">
+                    <Border Width="200" Height="300" CornerRadius="8" Background="#22FFFFFF">
+                        <Grid>
+                            <FontIcon Glyph="{x:Bind Glyph}" FontSize="48" Foreground="#99FFFFFF" />
+                            <Image Source="{x:Bind Icon, Mode=OneWay}" Stretch="Uniform" Margin="36" />
+                            <Image Source="{x:Bind Cover, Mode=OneWay}" Stretch="UniformToFill" />
+                        </Grid>
+                    </Border>
+                    <TextBlock Text="{x:Bind Name}" Foreground="#CCFFFFFF" FontSize="15"
+                               TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" HorizontalAlignment="Center" />
+                </StackPanel>
+            </DataTemplate>
         </Grid.Resources>
+
+        <Grid.KeyboardAcceleratorPlacementMode>Hidden</Grid.KeyboardAcceleratorPlacementMode>
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="F11" Invoked="ToggleTv_Invoked" />
+        </Grid.KeyboardAccelerators>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
@@ -178,7 +208,16 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
+                    <Button x:Name="TvButton" Grid.Column="3" Click="EnterTv_Click" VerticalAlignment="Center"
+                            AutomationProperties.Name="Modalità TV"
+                            ToolTipService.ToolTip="Schermo intero, navigabile con il controller (F11 o Start)">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE7F4;" FontSize="14" />
+                            <TextBlock Text="Modalità TV" />
+                        </StackPanel>
+                    </Button>
                     <StackPanel>
                         <TextBlock x:Name="PageTitle" Text="Tutti i giochi" Style="{StaticResource TitleTextBlockStyle}" />
                         <TextBlock x:Name="CountText" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -284,5 +323,111 @@
                 </ScrollViewer>
             </Grid>
         </NavigationView>
+
+        <!-- ======================= Modalità TV: schermo intero, tastiera e controller ======================= -->
+        <Grid x:Name="TvView" Grid.RowSpan="2" Visibility="Collapsed" Background="#FF0B0E14"
+              RequestedTheme="Dark" KeyDown="TvView_KeyDown">
+            <Image x:Name="TvHero" Stretch="UniformToFill" Opacity="0.6">
+                <Image.OpacityTransition><ScalarTransition Duration="0:0:0.3" /></Image.OpacityTransition>
+            </Image>
+            <Rectangle>
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#990B0E14" Offset="0" />
+                        <GradientStop Color="#590B0E14" Offset="0.25" />
+                        <GradientStop Color="#D90B0E14" Offset="0.5" />
+                        <GradientStop Color="#F20B0E14" Offset="0.65" />
+                        <GradientStop Color="#FF0B0E14" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <Grid Padding="72,40,72,32" RowSpacing="24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- In alto: nome dell'app e ora -->
+                <Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <FontIcon Glyph="&#xE7FC;" FontSize="22" />
+                        <TextBlock Text="Ludoteca" FontSize="22" FontWeight="SemiBold" />
+                    </StackPanel>
+                    <TextBlock x:Name="TvClock" FontSize="22" HorizontalAlignment="Right" />
+                </Grid>
+
+                <!-- Gioco selezionato -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Spacing="10" MaxWidth="900" HorizontalAlignment="Left">
+                    <TextBlock x:Name="TvTitle" FontSize="52" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="TvDetails" FontSize="20" Foreground="#CCFFFFFF" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,12,0,0">
+                        <Button x:Name="TvPlayButton" Click="TvPlay_Click" Style="{StaticResource AccentButtonStyle}"
+                                Padding="28,12" XYFocusDown="{x:Bind TvList}" AutomationProperties.Name="Gioca">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <FontIcon Glyph="&#xE768;" FontSize="20" />
+                                <TextBlock Text="Gioca" FontSize="20" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="TvOptionsButton" Click="TvOptions_Click" Padding="20,12" XYFocusDown="{x:Bind TvList}"
+                                AutomationProperties.Name="Opzioni">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <FontIcon Glyph="&#xE712;" FontSize="20" />
+                                <TextBlock Text="Opzioni" FontSize="20" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Fila di copertine -->
+                <ListView x:Name="TvList" Grid.Row="2" Height="360" SelectionMode="Single"
+                          IsItemClickEnabled="True" ItemClick="TvList_ItemClick"
+                          SelectionChanged="TvList_SelectionChanged"
+                          ItemTemplate="{StaticResource TvCoverTemplate}"
+                          ScrollViewer.HorizontalScrollMode="Enabled" ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                          ScrollViewer.VerticalScrollMode="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                          ScrollViewer.IsHorizontalRailEnabled="True" Padding="0,24,0,0">
+                    <ListView.Resources>
+                        <!-- Niente riquadro di selezione: la copertina selezionata si riconosce perché è più grande. -->
+                        <SolidColorBrush x:Key="ListViewItemBackgroundSelected" Color="Transparent" />
+                        <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver" Color="Transparent" />
+                        <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPressed" Color="Transparent" />
+                        <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="Transparent" />
+                        <SolidColorBrush x:Key="ListViewItemBackgroundPressed" Color="Transparent" />
+                        <SolidColorBrush x:Key="ListViewItemSelectionIndicatorBrush" Color="Transparent" />
+                    </ListView.Resources>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsStackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="Margin" Value="0,0,20,0" />
+                            <Setter Property="Padding" Value="0" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+
+                <!-- Suggerimenti dei comandi -->
+                <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="32" HorizontalAlignment="Right">
+                    <TextBlock x:Name="TvHintPlay" Text="Ⓐ  Gioca" FontSize="16" Foreground="#CCFFFFFF" />
+                    <TextBlock x:Name="TvHintOptions" Text="Ⓨ  Opzioni" FontSize="16" Foreground="#CCFFFFFF" />
+                    <TextBlock x:Name="TvHintExit" Text="⧉  Esci dalla modalità TV" FontSize="16" Foreground="#CCFFFFFF" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Avvio in corso -->
+            <Grid x:Name="TvLaunching" Visibility="Collapsed" Background="#D90B0E14">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+                    <ProgressRing IsActive="True" Width="56" Height="56" />
+                    <TextBlock x:Name="TvLaunchingText" FontSize="28" HorizontalAlignment="Center" />
+                    <TextBlock x:Name="TvLaunchingSource" FontSize="18" Foreground="#CCFFFFFF" HorizontalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

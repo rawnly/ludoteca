@@ -43,6 +43,9 @@ public sealed class GameEntry : INotifyPropertyChanged
     /// <summary>URI, riga di comando, nome completo del pacchetto o URI del launcher.</summary>
     public required string UninstallTarget { get; init; }
 
+    /// <summary>Id del gioco nel launcher, quando non si ricava da UninstallTarget (es. AppName di Epic).</summary>
+    public string? LaunchId { get; init; }
+
     public string Drive => PathUtil.DriveOf(InstallPath);
 
     public string Subtitle => $"{Source}  ·  {LastPlayedText}  ·  {InstallPath}";
@@ -107,6 +110,7 @@ public sealed class GameEntry : INotifyPropertyChanged
 
     /// <summary>Nome accessibile dei pulsanti (lettori di schermo, UI Automation).</summary>
     public string UninstallLabel => $"Disinstalla {Name}";
+    public string PlayLabel => $"Gioca a {Name}";
 
     /// <summary>Motivo mostrato nella griglia "Da disinstallare".</summary>
     public string RecommendReason => Recommender.Reason(this);

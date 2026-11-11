@@ -262,6 +262,7 @@ public static partial class GameScanner
                 InstallPath = PathUtil.Resolve(location),
                 UninstallKind = UninstallKind.LauncherOnly,
                 UninstallTarget = "com.epicgames.launcher://store/library",
+                LaunchId = root.TryGetProperty("AppName", out var app) ? app.GetString() : null,
             };
         }
     }
